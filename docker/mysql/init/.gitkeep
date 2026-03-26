@@ -1,0 +1,2 @@
+# Keep directory for optional MySQL init scripts.
+# Flyway is the primary schema initialization mechanism for this project.

@@ -1,0 +1,29 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: kaoyan-assistant-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: kaoyan_assistant_system
+      MYSQL_USER: kaoyan_user
+      MYSQL_PASSWORD: kaoyan_pass
+      MYSQL_ROOT_PASSWORD: root123456
+      TZ: Asia/Shanghai
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-time-zone=+08:00
+    ports:
+      - "3307:3306"
+    volumes:
+      - kaoyan_mysql_data:/var/lib/mysql
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-ukaoyan_user", "-pkaoyan_pass"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+volumes:
+  kaoyan_mysql_data:

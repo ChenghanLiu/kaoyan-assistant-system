@@ -1,0 +1,46 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  application:
+    name: kaoyan-assistant-backend
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3307/kaoyan_assistant_system?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false}
+    username: ${DB_USERNAME:kaoyan_user}
+    password: ${DB_PASSWORD:kaoyan_pass}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    encoding: UTF-8
+  servlet:
+    multipart:
+      max-file-size: ${UPLOAD_MAX_FILE_SIZE:20MB}
+      max-request-size: ${UPLOAD_MAX_REQUEST_SIZE:20MB}
+  jackson:
+    time-zone: Asia/Shanghai
+    date-format: yyyy-MM-dd HH:mm:ss
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:kaoyanassistantdemosecretkey1234567890}
+    expire-seconds: ${JWT_EXPIRE_SECONDS:86400}
+  storage:
+    location: ${STORAGE_LOCATION:../uploads}
+    max-file-size-mb: ${STORAGE_MAX_FILE_SIZE_MB:20}
+  cors:
+    allowed-origins:
+      - ${FRONTEND_ORIGIN:http://localhost:5173}
+
+logging:
+  level:
+    org.springframework.security: INFO
