@@ -1,6 +1,6 @@
 services:
   mysql:
-    image: mysql:8.0
+    image: mysql:8.0.39
     container_name: kaoyan-assistant-mysql
     restart: unless-stopped
     environment:
@@ -17,13 +17,56 @@ services:
       - "3307:3306"
     volumes:
       - kaoyan_mysql_data:/var/lib/mysql
-      - ./docker/mysql/init:/docker-entrypoint-initdb.d
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-ukaoyan_user", "-pkaoyan_pass"]
       interval: 10s
       timeout: 5s
-      retries: 10
+      retries: 15
       start_period: 30s
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: kaoyan-assistant-backend
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Shanghai
+      SERVER_PORT: 8080
+      DB_URL: jdbc:mysql://mysql:3306/kaoyan_assistant_system?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false
+      DB_USERNAME: kaoyan_user
+      DB_PASSWORD: kaoyan_pass
+      SPRING_FLYWAY_ENABLED: "false"
+      STORAGE_LOCATION: /app/uploads
+      FRONTEND_ORIGIN: http://localhost:8081
+      JWT_SECRET: kaoyanassistantdemosecretkey1234567890
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "18080:8080"
+    volumes:
+      - kaoyan_uploads:/app/uploads
+    healthcheck:
+      test: ["CMD-SHELL", "wget -S --spider -O - http://127.0.0.1:8080/api/notices 2>&1 | grep -Eq 'HTTP/1.1 (200|401)' "]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 60s
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: kaoyan-assistant-frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "8081:80"
 
 volumes:
   kaoyan_mysql_data:
+  kaoyan_uploads:
