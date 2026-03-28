@@ -11,4 +11,10 @@ public interface WrongQuestionRepository extends JpaRepository<WrongQuestion, Lo
     List<WrongQuestion> findByUserIdOrderByUpdatedAtDesc(Long userId);
 
     Optional<WrongQuestion> findByUserIdAndQuestionId(Long userId, Long questionId);
+
+    boolean existsByUserId(Long userId);
+
+    boolean existsByPaperId(Long paperId);
+
+    boolean existsByQuestionId(Long questionId);
 }

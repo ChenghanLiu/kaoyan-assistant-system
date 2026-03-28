@@ -79,6 +79,15 @@ public class SystemNoticeService {
         return toResponse(savedNotice);
     }
 
+    @Transactional
+    public void deleteNotice(LoginUser loginUser, Long noticeId) {
+        SystemNotice notice = systemNoticeRepository.findById(noticeId)
+                .orElseThrow(() -> BusinessException.notFound("system notice not found"));
+        systemNoticeRepository.delete(notice);
+        operationLogService.record(loginUser, "NOTICE", "DELETE",
+                "删除系统公告《" + notice.getTitle() + "》", "/api/admin/notices/" + noticeId);
+    }
+
     private String normalizeTargetRole(String targetRole) {
         String normalized = targetRole.trim().toUpperCase(Locale.ROOT);
         if (!Set.of("ALL", "STUDENT", "ADMIN").contains(normalized)) {

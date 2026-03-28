@@ -14,9 +14,10 @@
       </el-table-column>
       <el-table-column prop="content" label="内容" min-width="320" />
       <el-table-column prop="updatedAt" label="更新时间" width="180" />
-      <el-table-column label="操作" width="120">
+      <el-table-column label="操作" width="180">
         <template #default="{ row }">
           <el-button type="primary" link @click="openEdit(row)">编辑</el-button>
+          <el-button type="danger" link @click="handleDelete(row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -42,8 +43,8 @@
 
 <script setup>
 import { onMounted, reactive, ref } from 'vue'
-import { ElMessage } from 'element-plus'
-import { createNotice, fetchNotices, updateNotice } from '../../api/admin'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { createNotice, deleteNotice, fetchNotices, updateNotice } from '../../api/admin'
 
 const list = ref([])
 const dialogVisible = ref(false)
@@ -89,6 +90,19 @@ const handleSubmit = async () => {
   dialogVisible.value = false
   resetForm()
   await loadData()
+}
+
+const handleDelete = async (id) => {
+  try {
+    await ElMessageBox.confirm('确认删除该公告吗？', '提示', { type: 'warning' })
+    await deleteNotice(id)
+    ElMessage.success('删除成功')
+    await loadData()
+  } catch (error) {
+    if (error !== 'cancel' && error !== 'close') {
+      ElMessage.error(error.message || '删除失败')
+    }
+  }
 }
 
 onMounted(async () => {

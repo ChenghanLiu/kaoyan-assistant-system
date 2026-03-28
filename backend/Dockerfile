@@ -1,11 +1,11 @@
-FROM maven:3.9.9-eclipse-temurin-17 AS builder
+FROM docker.1ms.run/maven:3.9.9-eclipse-temurin-17 AS builder
 WORKDIR /build
 COPY backend/pom.xml backend/pom.xml
 RUN mvn -f backend/pom.xml -q -DskipTests dependency:go-offline
 COPY backend/src backend/src
 RUN mvn -f backend/pom.xml -DskipTests clean package
 
-FROM eclipse-temurin:17-jre-jammy AS runtime
+FROM docker.1ms.run/eclipse-temurin:17-jre-jammy AS runtime
 WORKDIR /app
 ENV TZ=Asia/Shanghai
 RUN apt-get update \

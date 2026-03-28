@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,5 +39,11 @@ public class AdminNoticeController {
     public ApiResponse<SystemNoticeResponse> updateNotice(@PathVariable @Positive Long id,
                                                           @Valid @RequestBody SystemNoticeUpdateRequest request) {
         return ApiResponse.success("notice updated", systemNoticeService.updateNotice(SecurityUtils.getLoginUser(), id, request));
+    }
+
+    @DeleteMapping("/{id}")
+    public ApiResponse<Void> deleteNotice(@PathVariable @Positive Long id) {
+        systemNoticeService.deleteNotice(SecurityUtils.getLoginUser(), id);
+        return ApiResponse.success("notice deleted", null);
     }
 }

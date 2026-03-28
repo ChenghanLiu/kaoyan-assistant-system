@@ -26,4 +26,6 @@ public interface StudyTaskRepository extends JpaRepository<StudyTask, Long> {
     long countByPlanIdAndUserIdAndStatus(Long planId, Long userId, TaskStatus status);
 
     long countByStatus(TaskStatus status);
+
+    boolean existsByUserId(Long userId);
 }

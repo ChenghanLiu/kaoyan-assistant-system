@@ -5,6 +5,30 @@ const request = axios.create({
   timeout: 10000
 })
 
+const readBlobMessage = async (blob) => {
+  try {
+    const text = await blob.text()
+    if (!text) {
+      return ''
+    }
+    const payload = JSON.parse(text)
+    return payload?.message || text
+  } catch {
+    return ''
+  }
+}
+
+export const resolveRequestErrorMessage = async (error) => {
+  const responseData = error?.response?.data
+  if (responseData instanceof Blob) {
+    const blobMessage = await readBlobMessage(responseData)
+    if (blobMessage) {
+      return blobMessage
+    }
+  }
+  return responseData?.message || error.message || '网络异常'
+}
+
 request.interceptors.request.use((config) => {
   const token = localStorage.getItem('token')
   if (token) {
@@ -21,7 +45,7 @@ request.interceptors.response.use(
     }
     return Promise.reject(new Error(payload.message || '请求失败'))
   },
-  (error) => Promise.reject(new Error(error.response?.data?.message || error.message || '网络异常'))
+  async (error) => Promise.reject(new Error(await resolveRequestErrorMessage(error)))
 )
 
 export default request

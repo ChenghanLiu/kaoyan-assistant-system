@@ -14,4 +14,6 @@ public interface ExamQuestionRepository extends JpaRepository<ExamQuestion, Long
     List<ExamQuestion> findAllByOrderByCreatedAtDesc();
 
     long countByPaperId(Long paperId);
+
+    boolean existsByPaperId(Long paperId);
 }

@@ -101,7 +101,7 @@ const router = createRouter({
 
 router.beforeEach(async (to) => {
   const authStore = useAuthStore()
-  if (authStore.token && !authStore.user) {
+  if (authStore.token && (!authStore.user || authStore.shouldHydrateProfile)) {
     try {
       await authStore.fetchMe()
     } catch (error) {

@@ -112,21 +112,34 @@ const loadComments = async (postId) => {
 }
 
 const handleDeletePost = async (id) => {
-  await ElMessageBox.confirm('确认删除该帖子吗？', '提示', { type: 'warning' })
-  await deleteAdminPost(id)
-  ElMessage.success('删除成功')
-  if (selectedPostId.value === id) {
-    commentDialogVisible.value = false
+  try {
+    await ElMessageBox.confirm('确认删除该帖子吗？', '提示', { type: 'warning' })
+    await deleteAdminPost(id)
+    ElMessage.success('删除成功')
+    if (selectedPostId.value === id) {
+      commentDialogVisible.value = false
+    }
+    await loadDashboard()
+  } catch (error) {
+    if (error !== 'cancel' && error !== 'close') {
+      ElMessage.error(error.message || '删除失败')
+    }
   }
-  loadDashboard()
 }
 
 const handleDeleteComment = async (id) => {
-  await ElMessageBox.confirm('确认删除该评论吗？', '提示', { type: 'warning' })
-  await deleteAdminComment(id)
-  ElMessage.success('删除成功')
-  if (selectedPostId.value) {
-    comments.value = await fetchAdminPostComments(selectedPostId.value)
+  try {
+    await ElMessageBox.confirm('确认删除该评论吗？', '提示', { type: 'warning' })
+    await deleteAdminComment(id)
+    ElMessage.success('删除成功')
+    if (selectedPostId.value) {
+      comments.value = await fetchAdminPostComments(selectedPostId.value)
+    }
+    await loadDashboard()
+  } catch (error) {
+    if (error !== 'cancel' && error !== 'close') {
+      ElMessage.error(error.message || '删除失败')
+    }
   }
 }
 

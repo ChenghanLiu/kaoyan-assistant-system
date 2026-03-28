@@ -15,4 +15,8 @@ public interface PolicyNewsRepository extends JpaRepository<PolicyNews, Long> {
             order by news.publishedDate desc, news.id desc
             """)
     List<PolicyNews> findAllByFilter(Long schoolId, Long majorId);
+
+    boolean existsBySchoolId(Long schoolId);
+
+    boolean existsByMajorId(Long majorId);
 }

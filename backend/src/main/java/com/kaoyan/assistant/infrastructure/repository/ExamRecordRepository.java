@@ -21,4 +21,8 @@ public interface ExamRecordRepository extends JpaRepository<ExamRecord, Long> {
 
     @Query("select coalesce(min(e.score), 0) from ExamRecord e")
     Integer findLowestScore();
+
+    boolean existsByPaperId(Long paperId);
+
+    boolean existsByUserId(Long userId);
 }

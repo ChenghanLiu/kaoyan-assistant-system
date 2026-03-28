@@ -1,5 +1,24 @@
 import axios from 'axios'
 import request from '../utils/request'
+import { resolveRequestErrorMessage } from '../utils/request'
+
+const downloadRequest = axios.create({
+  baseURL: '/api',
+  timeout: 10000
+})
+
+downloadRequest.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token')
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
+})
+
+downloadRequest.interceptors.response.use(
+  (response) => response,
+  async (error) => Promise.reject(new Error(await resolveRequestErrorMessage(error)))
+)
 
 export const fetchSchools = (keyword) => request.get('/schools', { params: { keyword } })
 export const fetchSchoolDetail = (id) => request.get(`/schools/${id}`)
@@ -34,15 +53,8 @@ export const fetchMaterials = () => request.get('/materials')
 export const fetchMaterialDetail = (id) => request.get(`/student/materials/${id}`)
 export const fetchMyMaterials = () => request.get('/student/materials/mine')
 export const fetchMaterialCategories = () => request.get('/student/materials/categories')
-export const uploadMaterial = (data) => request.post('/student/materials', data, {
-  headers: { 'Content-Type': 'multipart/form-data' }
-})
-export const downloadMaterial = (id) => {
-  const token = localStorage.getItem('token')
-  return axios.get(`/api/student/materials/${id}/download`, {
-    responseType: 'blob',
-    headers: token ? { Authorization: `Bearer ${token}` } : {}
-  })
-}
+export const uploadMaterial = (data) => request.post('/student/materials', data)
+export const downloadMaterial = (id) => downloadRequest.get(`/student/materials/${id}/download`, { responseType: 'blob' })
 export const fetchProfile = () => request.get('/student/profile')
+export const updateProfile = (data) => request.patch('/student/profile', data)
 export const fetchNotices = () => request.get('/notices')

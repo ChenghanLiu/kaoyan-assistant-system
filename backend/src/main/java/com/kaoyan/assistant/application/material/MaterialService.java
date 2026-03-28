@@ -147,6 +147,15 @@ public class MaterialService {
         return new MaterialDownloadResponse(localStorageService.load(material.getFilePath()), material.getFileName());
     }
 
+    @Transactional
+    public void delete(Long adminUserId, Long materialId) {
+        Material material = requireMaterial(materialId);
+        materialRepository.delete(material);
+        localStorageService.delete(material.getFilePath());
+        operationLogService.record(toLoginUser(adminUserId), "MATERIAL", "DELETE",
+                "删除资料《" + material.getTitle() + "》", "/api/admin/materials/" + materialId);
+    }
+
     private Material requireMaterial(Long materialId) {
         return materialRepository.findById(materialId)
                 .orElseThrow(() -> BusinessException.notFound("material not found"));

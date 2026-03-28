@@ -13,6 +13,11 @@
       <el-table-column prop="city" label="城市" />
       <el-table-column prop="schoolType" label="类型" />
       <el-table-column prop="schoolLevel" label="层次" />
+      <el-table-column label="操作" width="120">
+        <template #default="{ row }">
+          <el-button link type="danger" @click="handleDelete(row.id)">删除</el-button>
+        </template>
+      </el-table-column>
     </el-table>
     <el-dialog v-model="dialogVisible" title="新增院校" width="520px">
       <el-form :model="form" label-position="top">
@@ -33,8 +38,8 @@
 
 <script setup>
 import { onMounted, reactive, ref } from 'vue'
-import { ElMessage } from 'element-plus'
-import { createAdminSchool, fetchAdminSchools } from '../../api/admin'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { createAdminSchool, deleteAdminSchool, fetchAdminSchools } from '../../api/admin'
 
 const schools = ref([])
 const dialogVisible = ref(false)
@@ -50,6 +55,19 @@ const handleCreate = async () => {
   dialogVisible.value = false
   Object.assign(form, { schoolName: '', province: '', city: '', schoolType: '', schoolLevel: '', description: '' })
   loadData()
+}
+
+const handleDelete = async (id) => {
+  try {
+    await ElMessageBox.confirm('确认删除该院校吗？若存在关联专业、简章、报录比或政策资讯将禁止删除。', '提示', { type: 'warning' })
+    await deleteAdminSchool(id)
+    ElMessage.success('删除成功')
+    await loadData()
+  } catch (error) {
+    if (error !== 'cancel' && error !== 'close') {
+      ElMessage.error(error.message || '删除失败')
+    }
+  }
 }
 
 onMounted(loadData)

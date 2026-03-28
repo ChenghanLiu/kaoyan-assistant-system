@@ -344,6 +344,47 @@ public class ExamService {
         return toOptionResponse(examOptionRepository.save(option));
     }
 
+    @Transactional
+    public void deletePaper(Long paperId) {
+        ExamPaper paper = requirePaper(paperId);
+        if (examRecordRepository.existsByPaperId(paperId) || wrongQuestionRepository.existsByPaperId(paperId)) {
+            throw BusinessException.invalidInput("paper has exam records and cannot be deleted");
+        }
+        List<ExamQuestion> questions = examQuestionRepository.findByPaperIdOrderBySortOrderAscIdAsc(paperId);
+        for (ExamQuestion question : questions) {
+            deleteQuestionInternal(question);
+        }
+        examPaperRepository.delete(paper);
+    }
+
+    @Transactional
+    public void deleteQuestion(Long questionId) {
+        ExamQuestion question = requireQuestion(questionId);
+        deleteQuestionInternal(question);
+        refreshPaperStats(question.getPaperId());
+    }
+
+    @Transactional
+    public void deleteOption(Long questionId, Long optionId) {
+        ExamQuestion question = requireQuestion(questionId);
+        ExamOption option = examOptionRepository.findById(optionId)
+                .orElseThrow(() -> BusinessException.notFound("exam option not found"));
+        if (!option.getQuestionId().equals(question.getId())) {
+            throw BusinessException.invalidInput("option does not belong to question");
+        }
+        if (examAnswerRepository.existsByQuestionId(questionId)) {
+            throw BusinessException.invalidInput("question has answer records and option cannot be deleted");
+        }
+        if (wrongQuestionRepository.existsByQuestionId(questionId)) {
+            throw BusinessException.invalidInput("question has wrong-question records and option cannot be deleted");
+        }
+        List<String> correctAnswers = splitAnswers(normalizeCorrectAnswer(question));
+        if (correctAnswers.contains(option.getOptionLabel())) {
+            throw BusinessException.invalidInput("correct option cannot be deleted");
+        }
+        examOptionRepository.delete(option);
+    }
+
     private ExamPaper requirePaper(Long paperId) {
         return examPaperRepository.findById(paperId)
                 .orElseThrow(() -> BusinessException.notFound("exam paper not found"));
@@ -352,6 +393,18 @@ public class ExamService {
     private ExamQuestion requireQuestion(Long questionId) {
         return examQuestionRepository.findById(questionId)
                 .orElseThrow(() -> BusinessException.notFound("exam question not found"));
+    }
+
+    private void deleteQuestionInternal(ExamQuestion question) {
+        if (examAnswerRepository.existsByQuestionId(question.getId())) {
+            throw BusinessException.invalidInput("question has answer records and cannot be deleted");
+        }
+        if (wrongQuestionRepository.existsByQuestionId(question.getId())) {
+            throw BusinessException.invalidInput("question has wrong-question records and cannot be deleted");
+        }
+        examOptionRepository.findByQuestionIdOrderByOptionLabelAsc(question.getId())
+                .forEach(examOptionRepository::delete);
+        examQuestionRepository.delete(question);
     }
 
     private ExamPaperSummaryResponse toPaperSummary(ExamPaper paper) {

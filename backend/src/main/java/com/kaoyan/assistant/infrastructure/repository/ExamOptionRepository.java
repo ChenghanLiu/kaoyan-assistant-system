@@ -11,4 +11,6 @@ public interface ExamOptionRepository extends JpaRepository<ExamOption, Long> {
     List<ExamOption> findByQuestionIdOrderByOptionLabelAsc(Long questionId);
 
     List<ExamOption> findByQuestionIdInOrderByQuestionIdAscOptionLabelAsc(Collection<Long> questionIds);
+
+    boolean existsByQuestionId(Long questionId);
 }

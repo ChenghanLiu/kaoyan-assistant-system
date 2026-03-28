@@ -17,4 +17,8 @@ public interface ApplicationRatioRepository extends JpaRepository<ApplicationRat
     List<ApplicationRatio> findAllByFilter(Long schoolId, Long majorId);
 
     List<ApplicationRatio> findBySchoolIdOrderByRatioYearDescIdDesc(Long schoolId);
+
+    boolean existsBySchoolId(Long schoolId);
+
+    boolean existsByMajorId(Long majorId);
 }

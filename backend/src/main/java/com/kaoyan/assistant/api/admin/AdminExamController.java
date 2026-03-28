@@ -10,6 +10,7 @@ import com.kaoyan.assistant.application.exam.dto.ExamPaperSummaryResponse;
 import com.kaoyan.assistant.common.model.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -59,5 +60,23 @@ public class AdminExamController {
     @PostMapping("/questions/{id}/options")
     public ApiResponse<ExamOptionResponse> createOption(@PathVariable Long id, @Valid @RequestBody AdminCreateOptionRequest request) {
         return ApiResponse.success("create success", examService.createOption(id, request));
+    }
+
+    @DeleteMapping("/papers/{id}")
+    public ApiResponse<Void> deletePaper(@PathVariable Long id) {
+        examService.deletePaper(id);
+        return ApiResponse.success("paper deleted", null);
+    }
+
+    @DeleteMapping("/questions/{id}")
+    public ApiResponse<Void> deleteQuestion(@PathVariable Long id) {
+        examService.deleteQuestion(id);
+        return ApiResponse.success("question deleted", null);
+    }
+
+    @DeleteMapping("/questions/{id}/options/{optionId}")
+    public ApiResponse<Void> deleteOption(@PathVariable Long id, @PathVariable Long optionId) {
+        examService.deleteOption(id, optionId);
+        return ApiResponse.success("option deleted", null);
     }
 }

@@ -7,6 +7,7 @@ import com.kaoyan.assistant.common.model.ApiResponse;
 import com.kaoyan.assistant.common.util.SecurityUtils;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,5 +37,11 @@ public class AdminConfigController {
     public ApiResponse<SystemConfigResponse> updateConfig(@PathVariable String key,
                                                           @Valid @RequestBody SystemConfigUpdateRequest request) {
         return ApiResponse.success("config updated", systemConfigService.updateConfig(SecurityUtils.getLoginUser(), key, request));
+    }
+
+    @DeleteMapping("/{key}")
+    public ApiResponse<Void> deleteConfig(@PathVariable String key) {
+        systemConfigService.deleteConfig(SecurityUtils.getLoginUser(), key);
+        return ApiResponse.success("config deleted", null);
     }
 }

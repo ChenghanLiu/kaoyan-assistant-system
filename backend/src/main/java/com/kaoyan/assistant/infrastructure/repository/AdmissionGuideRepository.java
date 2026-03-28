@@ -17,4 +17,8 @@ public interface AdmissionGuideRepository extends JpaRepository<AdmissionGuide, 
     List<AdmissionGuide> findAllByFilter(Long schoolId, Long majorId);
 
     List<AdmissionGuide> findBySchoolIdOrderByGuideYearDescIdDesc(Long schoolId);
+
+    boolean existsBySchoolId(Long schoolId);
+
+    boolean existsByMajorId(Long majorId);
 }

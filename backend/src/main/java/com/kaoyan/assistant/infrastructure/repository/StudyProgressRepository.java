@@ -14,4 +14,6 @@ public interface StudyProgressRepository extends JpaRepository<StudyProgress, Lo
     List<StudyProgress> findByPlanIdOrderByRecordedAtDesc(Long planId);
 
     List<StudyProgress> findByPlanIdAndUserIdOrderByRecordedAtDesc(Long planId, Long userId);
+
+    boolean existsByUserId(Long userId);
 }

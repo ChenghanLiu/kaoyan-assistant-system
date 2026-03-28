@@ -11,4 +11,6 @@ public interface StudyPlanRepository extends JpaRepository<StudyPlan, Long> {
     List<StudyPlan> findByUserIdOrderByCreatedAtDesc(Long userId);
 
     Optional<StudyPlan> findByIdAndUserId(Long id, Long userId);
+
+    boolean existsByUserId(Long userId);
 }

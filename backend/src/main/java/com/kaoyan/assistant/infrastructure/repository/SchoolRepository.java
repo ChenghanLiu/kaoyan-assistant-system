@@ -8,4 +8,6 @@ import java.util.List;
 public interface SchoolRepository extends JpaRepository<School, Long> {
 
     List<School> findBySchoolNameContainingIgnoreCaseOrderByIdAsc(String keyword);
+
+    boolean existsBySchoolNameIgnoreCase(String schoolName);
 }

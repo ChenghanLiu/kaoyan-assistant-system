@@ -10,10 +10,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.Set;
 import java.util.List;
 
 @Service
 public class SystemConfigService {
+
+    private static final Set<String> PROTECTED_CONFIG_KEYS = Set.of(
+            "site_name",
+            "upload_max_size_mb",
+            "exam_default_duration_minutes"
+    );
 
     private final SystemConfigRepository systemConfigRepository;
     private final OperationLogService operationLogService;
@@ -58,5 +65,17 @@ public class SystemConfigService {
                 savedConfig.getConfigDescription(),
                 savedConfig.getUpdatedAt()
         );
+    }
+
+    @Transactional
+    public void deleteConfig(LoginUser loginUser, String configKey) {
+        SystemConfig config = systemConfigRepository.findByConfigKey(configKey)
+                .orElseThrow(() -> BusinessException.notFound("system config not found"));
+        if (PROTECTED_CONFIG_KEYS.contains(config.getConfigKey())) {
+            throw BusinessException.invalidInput("critical config cannot be deleted");
+        }
+        systemConfigRepository.delete(config);
+        operationLogService.record(loginUser, "CONFIG", "DELETE",
+                "删除系统配置 " + config.getConfigKey(), "/api/admin/configs/" + configKey);
     }
 }

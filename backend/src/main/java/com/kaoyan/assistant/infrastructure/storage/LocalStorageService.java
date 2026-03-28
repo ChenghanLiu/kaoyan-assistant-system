@@ -87,6 +87,22 @@ public class LocalStorageService {
         }
     }
 
+    public void delete(String storedFileName) {
+        if (!StringUtils.hasText(storedFileName)) {
+            return;
+        }
+        try {
+            Path filePath = rootPath.resolve(storedFileName).normalize();
+            if (!filePath.startsWith(rootPath)) {
+                throw BusinessException.invalidInput("file path is invalid");
+            }
+            Files.deleteIfExists(filePath);
+        } catch (IOException exception) {
+            log.error("file delete failed: storedFileName={}", storedFileName, exception);
+            throw new BusinessException("file delete failed");
+        }
+    }
+
     private Path resolveStorageRoot(String location) {
         Path configuredPath = Paths.get(location);
         if (configuredPath.isAbsolute()) {

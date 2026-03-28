@@ -62,6 +62,11 @@
             <el-button type="primary" link @click="openOptionPanel(row)">查看/新增</el-button>
           </template>
         </el-table-column>
+        <el-table-column label="操作" width="120">
+          <template #default="{ row }">
+            <el-button type="danger" link @click="handleDeleteQuestion(row.id)">删除</el-button>
+          </template>
+        </el-table-column>
       </el-table>
     </div>
 
@@ -82,6 +87,11 @@
       <el-table :data="options" style="margin-top: 12px">
         <el-table-column prop="optionLabel" label="标签" width="120" />
         <el-table-column prop="optionContent" label="内容" />
+        <el-table-column label="操作" width="120">
+          <template #default="{ row }">
+            <el-button type="danger" link @click="handleDeleteOption(row.id)">删除</el-button>
+          </template>
+        </el-table-column>
       </el-table>
     </div>
   </div>
@@ -89,10 +99,12 @@
 
 <script setup>
 import { onMounted, ref } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import {
   createQuestion,
   createQuestionOption,
+  deleteQuestion,
+  deleteQuestionOption,
   fetchPapers,
   fetchQuestionOptions,
   fetchQuestions
@@ -161,6 +173,38 @@ const handleCreateOption = async () => {
   ElMessage.success('选项已创建')
   optionForm.value = { optionLabel: '', optionContent: '' }
   await openOptionPanel(activeQuestion.value)
+}
+
+const handleDeleteQuestion = async (id) => {
+  try {
+    await ElMessageBox.confirm('确认删除该题目吗？若存在答题记录或错题记录将禁止删除。', '提示', { type: 'warning' })
+    await deleteQuestion(id)
+    ElMessage.success('删除成功')
+    if (activeQuestion.value?.id === id) {
+      activeQuestion.value = null
+      options.value = []
+    }
+    await loadPapers()
+    await loadQuestions()
+  } catch (error) {
+    if (error !== 'cancel' && error !== 'close') {
+      ElMessage.error(error.message || '删除失败')
+    }
+  }
+}
+
+const handleDeleteOption = async (optionId) => {
+  if (!activeQuestion.value) return
+  try {
+    await ElMessageBox.confirm('确认删除该选项吗？若已产生答题记录或该选项为正确答案将禁止删除。', '提示', { type: 'warning' })
+    await deleteQuestionOption(activeQuestion.value.id, optionId)
+    ElMessage.success('删除成功')
+    await openOptionPanel(activeQuestion.value)
+  } catch (error) {
+    if (error !== 'cancel' && error !== 'close') {
+      ElMessage.error(error.message || '删除失败')
+    }
+  }
 }
 
 onMounted(async () => {

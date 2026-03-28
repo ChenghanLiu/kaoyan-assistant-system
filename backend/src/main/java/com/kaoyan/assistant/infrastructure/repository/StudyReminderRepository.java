@@ -10,4 +10,6 @@ public interface StudyReminderRepository extends JpaRepository<StudyReminder, Lo
     List<StudyReminder> findByUserIdOrderByRemindAtDescCreatedAtDesc(Long userId);
 
     List<StudyReminder> findByUserIdAndPlanIdOrderByRemindAtDescCreatedAtDesc(Long userId, Long planId);
+
+    boolean existsByUserId(Long userId);
 }

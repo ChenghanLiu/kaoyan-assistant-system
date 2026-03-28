@@ -20,4 +20,8 @@ public interface MaterialRepository extends JpaRepository<Material, Long> {
     List<Material> findAllByOrderByCreatedAtDesc();
 
     long countByReviewStatus(MaterialStatus reviewStatus);
+
+    boolean existsByUserId(Long userId);
+
+    boolean existsByReviewerId(Long reviewerId);
 }

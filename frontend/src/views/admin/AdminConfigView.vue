@@ -18,9 +18,10 @@
           <el-input v-model="row.configDescription" />
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="120">
+      <el-table-column label="操作" width="180">
         <template #default="{ row }">
           <el-button type="primary" link @click="handleSave(row)">保存</el-button>
+          <el-button type="danger" link @click="handleDelete(row.configKey)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -29,8 +30,8 @@
 
 <script setup>
 import { onMounted, ref } from 'vue'
-import { ElMessage } from 'element-plus'
-import { fetchSystemConfigs, updateSystemConfig } from '../../api/admin'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { deleteSystemConfig, fetchSystemConfigs, updateSystemConfig } from '../../api/admin'
 
 const list = ref([])
 
@@ -42,6 +43,19 @@ const handleSave = async (row) => {
   await updateSystemConfig(row.configKey, { configValue: row.configValue, configDescription: row.configDescription })
   ElMessage.success('保存成功')
   loadData()
+}
+
+const handleDelete = async (configKey) => {
+  try {
+    await ElMessageBox.confirm('确认删除该配置项吗？系统关键配置不允许删除。', '提示', { type: 'warning' })
+    await deleteSystemConfig(configKey)
+    ElMessage.success('删除成功')
+    await loadData()
+  } catch (error) {
+    if (error !== 'cancel' && error !== 'close') {
+      ElMessage.error(error.message || '删除失败')
+    }
+  }
 }
 
 onMounted(loadData)

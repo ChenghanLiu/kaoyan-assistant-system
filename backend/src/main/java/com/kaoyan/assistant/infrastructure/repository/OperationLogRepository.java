@@ -8,4 +8,6 @@ import java.util.List;
 public interface OperationLogRepository extends JpaRepository<OperationLog, Long> {
 
     List<OperationLog> findTop200ByOrderByCreatedAtDescIdDesc();
+
+    boolean existsByUserId(Long userId);
 }

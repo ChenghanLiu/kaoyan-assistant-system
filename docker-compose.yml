@@ -1,6 +1,6 @@
 services:
   mysql:
-    image: mysql:8.0.39
+    image: docker.1ms.run/mysql:8.0.39
     container_name: kaoyan-assistant-mysql
     restart: unless-stopped
     environment:

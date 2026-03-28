@@ -10,4 +10,6 @@ public interface MajorRepository extends JpaRepository<Major, Long> {
     List<Major> findAllByOrderByIdAsc();
 
     List<Major> findBySchoolIdOrderByIdAsc(Long schoolId);
+
+    boolean existsBySchoolId(Long schoolId);
 }

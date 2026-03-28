@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,5 +46,11 @@ public class AdminMaterialController {
                                                 @Valid @RequestBody MaterialReviewRequest request) {
         return ApiResponse.success("review success",
                 materialService.review(SecurityUtils.getLoginUser().getId(), id, request));
+    }
+
+    @DeleteMapping("/{id}")
+    public ApiResponse<Void> delete(@PathVariable @Positive(message = "id must be greater than 0") Long id) {
+        materialService.delete(SecurityUtils.getLoginUser().getId(), id);
+        return ApiResponse.success("material deleted", null);
     }
 }

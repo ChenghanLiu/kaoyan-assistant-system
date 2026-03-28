@@ -11,4 +11,6 @@ public interface ExamAnswerRepository extends JpaRepository<ExamAnswer, Long> {
     List<ExamAnswer> findByRecordIdOrderByIdAsc(Long recordId);
 
     List<ExamAnswer> findByRecordIdInOrderByRecordIdAscIdAsc(Collection<Long> recordIds);
+
+    boolean existsByQuestionId(Long questionId);
 }

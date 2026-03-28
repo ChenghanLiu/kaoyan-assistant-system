@@ -210,17 +210,29 @@ const handleSaveRatio = async () => {
 }
 
 const handleDeleteGuide = async (id) => {
-  await ElMessageBox.confirm('确认删除该招生简章吗？', '提示', { type: 'warning' })
-  await deleteGuide(id)
-  ElMessage.success('删除成功')
-  loadData()
+  try {
+    await ElMessageBox.confirm('确认删除该招生简章吗？', '提示', { type: 'warning' })
+    await deleteGuide(id)
+    ElMessage.success('删除成功')
+    await loadData()
+  } catch (error) {
+    if (error !== 'cancel' && error !== 'close') {
+      ElMessage.error(error.message || '删除失败')
+    }
+  }
 }
 
 const handleDeleteRatio = async (id) => {
-  await ElMessageBox.confirm('确认删除该报录比吗？', '提示', { type: 'warning' })
-  await deleteRatio(id)
-  ElMessage.success('删除成功')
-  loadData()
+  try {
+    await ElMessageBox.confirm('确认删除该报录比吗？', '提示', { type: 'warning' })
+    await deleteRatio(id)
+    ElMessage.success('删除成功')
+    await loadData()
+  } catch (error) {
+    if (error !== 'cancel' && error !== 'close') {
+      ElMessage.error(error.message || '删除失败')
+    }
+  }
 }
 
 const handleSchoolChange = () => {
