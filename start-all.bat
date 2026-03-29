@@ -1,6 +1,8 @@
 @echo off
 setlocal
 
+cd /d %~dp0
+
 where docker >nul 2>nul
 if errorlevel 1 (
   echo Docker CLI not found. Please install Docker Desktop first.

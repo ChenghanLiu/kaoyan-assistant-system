@@ -1,7 +1,6 @@
 .git
 .gitignore
 README.md
-backend/target
 frontend/dist
 frontend/node_modules
 uploads
